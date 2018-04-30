@@ -12,7 +12,8 @@ const fs           = require('fs'),
 
 const isProduction = process.env.NODE_ENV === 'production'
 
-const app = express()
+const app = express(),
+      port = process.env.PORT || 3000
 
 app.use(cors())
 
@@ -33,7 +34,7 @@ if(!isProduction) {
 if(isProduction) {
 	mongoose.connect(process.env.MONGODB_URI)
 } else {
-	mongoose.connect('mongodb://localhost/conduit')
+	mongoose.connect('mongodb://localhost:27017/social-api')
 	mongoose.set('debug', true)
 }
 
@@ -49,10 +50,7 @@ app.use(function (req, res, next) {
 	next(err)
 })
 
-/// error handlers
 
-// development error handler
-// will print stacktrace
 if(!isProduction) {
 	app.use(function (err, req, res, next) {
 		console.log(err.stack)
@@ -68,8 +66,6 @@ if(!isProduction) {
 	})
 }
 
-// production error handler
-// no stacktraces leaked to user
 app.use(function (err, req, res, next) {
 	res.status(err.status || 500)
 	res.json({
@@ -80,7 +76,6 @@ app.use(function (err, req, res, next) {
 	})
 })
 
-// finally, let's start our server...
-const server = app.listen(process.env.PORT || 3000, function () {
+const server = app.listen(port, function () {
 	console.log('Listening on port ' + server.address().port)
 })

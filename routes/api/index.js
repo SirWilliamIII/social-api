@@ -1,6 +1,10 @@
 const router = require('express').Router()
 
-router.use('/', require('./users'))
+const users = require('./users')
+const profiles = require('./profiles')
+
+router.use('/', users)
+router.use('/profiles', profiles)
 
 router.use((err, req, res, next) => {
 	if(err.name === 'ValidationError') {
