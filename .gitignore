@@ -3,6 +3,8 @@ logs
 *.log
 .DS_Store
 
+.idea/
+
 npm-debug.log*
 
 # Runtime data
