@@ -38,8 +38,9 @@ if(isProduction) {
 	mongoose.set('debug', true)
 }
 
-require('./models/User')
 require('./config/passport')
+require('./models/User')
+require('./models/Article')
 
 app.use(require('./routes'))
 
