@@ -18,6 +18,14 @@ router.get('/user', auth.required, (req, res, next) => {
 		.catch(next)
 })
 
+//  @/api/users
+router.get('/users', (req, res) => {
+	User.find()
+		.then(users => {
+			res.send({ users })
+		})
+})
+
 router.post('/users', (req, res, next) => {
 	const user = new User()
 
