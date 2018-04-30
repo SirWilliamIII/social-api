@@ -1,10 +1,11 @@
 const mongoose = require('mongoose'),
       Schema = mongoose.Schema,
       uniqueValidator = require('mongoose-unique-validator'),
-      slug = require('slug')
+      slug = require('slug'),
+      User = mongoose.model('User')
 
 
-const ArticleSchema = Schema({
+const ArticleSchema = new Schema({
 	slug: {
 		type: String,
 		lowercase: true,
@@ -39,7 +40,7 @@ ArticleSchema.pre('validate', next => {
 	next()
 })
 
-ArticleSchema.methods.toJSON = user => {
+ArticleSchema.methods.toArticleJSON = user => {
 	return {
 		slug: this.slug,
 		title: this.title,
@@ -49,8 +50,18 @@ ArticleSchema.methods.toJSON = user => {
 		updatedAt: this.updatedAt,
 		tagList: this.tagList,
 		favoritesCount: this.favoritesCount,
+		favorited: user ? user.isFavorite(this._id) : false,
 		author: this.author.toProfileJSON(user)
 	}
 }
 
-mongoose.model('Article', ArticleSchema)
+ArticleSchema.methods.updateFavoriteCount = function() {
+	const article = this
+	return User.count({ favorites: { $in: [article._id]}})
+		.then(count => {
+			article.favoritesCount = count
+			return article.save()
+		})
+}
+
+module.exports = mongoose.model('Article', ArticleSchema)

@@ -19,8 +19,26 @@ router.post('/', auth.required, (req, res, next) => {
 				.then(() => {
 					console.log(article.author)
 					return res.json({
-						article: article.toJSONFor(user)
+						article: article.toArticleJSON(user)
 					})
+				})
+		})
+		.catch(next)
+})
+
+router.post('/:article/favorite', auth.required, (req, res, next) => {
+	const articleId = req.article._id
+	User.findById(req.payload.id)
+		.then(user => {
+			if(!user) {
+				return res.status(401).send()
+			}
+			return user.favorite(articleId)
+				.then(() => {
+					return req.article.updateFavoriteCount()
+						.then(article => {
+							return res.json({ article: article.toArticleJSON(user) })
+						})
 				})
 		})
 		.catch(next)
@@ -44,10 +62,10 @@ router.get('/:article', auth.optional, (req, res, next) => {
 		req.payload ? User.findById(req.payload.id) : null,
 		req.article.populate('author').execPopulate()
 	])
-		.then(function (results) {
+		.then(results => {
 			const user = results[0]
 			return res.json({
-				article: req.article.toJSONFor(user)
+				article: req.article.toArticleJSON(user)
 			})
 		})
 		.catch(next)
@@ -74,7 +92,7 @@ router.put('/:article', auth.required, (req, res, next) => {
 					})
 					.catch(next)
 			} else {
-				return res.sendStatus(403)
+				return res.status(403).send()
 			}
 		})
 })
@@ -91,6 +109,24 @@ router.delete('/:article', auth.required, (req, res, next) => {
 				return res.sendStatus(403)
 			}
 		})
+})
+
+router.delete('/:article/favorite', auth.required, (req, res, next) => {
+	const articleId = req.article._id
+	User.findById(req.payload.id)
+		.then(user => {
+			if(!user) {
+				return res.status(401).send()
+			}
+			return user.unfavorite(articleId)
+				.then(() => {
+					return req.article.updateFavoriteCount()
+						.then(article => {
+							return res.json({ article: article.toArticleJSON(user) })
+						})
+				})
+		})
+		.catch(next)
 })
 
 module.exports = router
