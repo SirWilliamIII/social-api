@@ -30,9 +30,10 @@ const UserSchema = new Schema({
 	favorites: [
 		{
 			type: mongoose.Schema.Types.ObjectId,
-			ref: 'Article'
+			ref:  'Article'
 		}
-	]
+	],
+	following: [{ type: mongoose.Schema.Types.ObjectId, ref: 'User' }]
 
 }, { timestamps: true })
 
@@ -77,7 +78,7 @@ UserSchema.methods.toProfileJSON = user => {
 		username:  this.username,
 		bio:       this.bio,
 		image:     this.image || 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQjtzcONpGx_gK1jG7NvusIVkHFG76GWyueX3AdpsfKOnHTrxfe',
-		following: false
+		following: user ? user.isFollowing(this._id) : false
 	}
 }
 
@@ -98,5 +99,24 @@ UserSchema.methods.isFavorite = id => {
 		return favId.toString() === id.toString()
 	})
 }
+
+UserSchema.methods.follow = id => {
+	if(this.following.indexOf(id) === -1) {
+		this.following.push(id)
+	}
+	return this.save()
+}
+
+UserSchema.methods.unfollow = id => {
+	this.following.remove(id)
+	return this.save()
+}
+
+UserSchema.methods.isFollowing = id => {
+	return this.following.some(followId => {
+		return followId.toString() === id.toString()
+	})
+}
+
 
 mongoose.model('User', UserSchema)

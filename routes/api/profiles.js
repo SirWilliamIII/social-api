@@ -39,5 +39,37 @@ router.get('/:username', auth.optional, (req, res, next) => {
 	}
 })
 
+//  endpoint for following another user
+router.post('/:username/follow', auth.required, (req, res, next) => {
+	const profileId = req.profile._id
+	User.findById(req.payload.id)
+		.then(user => {
+			if(!user) {
+				return res.status(401).send()
+			}
+			return user.follow(profileId)
+				.then(() => {
+					return res.json({ profile: req.profile.toProfileJSON(user)})
+				})
+		})
+		.catch(next)
+})
+
+// to unfollow another user
+router.delete('/:username/follow', auth.required, (req, res, next) => {
+	const profileId = req.profile._id
+	User.findById(req.payload.id)
+		.then(user => {
+			if(!user) {
+				return res.status(401).send()
+			}
+			return user.unfollow(profileId)
+				.then(() => {
+					return res.json({profile: req.profile.toProfileJSON(user)})
+				})
+		})
+		.catch(next)
+})
+
 
 module.exports = router
