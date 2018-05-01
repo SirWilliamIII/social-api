@@ -4,12 +4,8 @@ const mongoose = require('mongoose'),
 
 const CommentSchema = new Schema({
 	body: String,
-	author: {
-		type: mongoose.Schema.Types.ObjectId, ref: 'User'
-	},
-	article: {
-		type: mongoose.Schema.Types.ObjectId, ref: 'Article'
-	}
+	author: { type: mongoose.Schema.Types.ObjectId, ref: 'User' },
+	article: { type: mongoose.Schema.Types.ObjectId, ref: 'Article' }
 }, { timestamps: true })
 
 CommentSchema.methods.toCommentJSON = user => {

@@ -14,7 +14,7 @@ router.param('username', (req, res, next, username) => {
 				return res.status(404).send()
 			}
 			req.profile = user
-			return next
+			return next()
 		})
 		.catch(next)
 })
@@ -24,18 +24,12 @@ router.get('/:username', auth.optional, (req, res, next) => {
 		User.findById(req.payload.id)
 			.then(user => {
 				if(!user) {
-					return res.json({
-						profile: req.profile.toProfileJSON(false)
-					})
+					return res.json({ profile: req.profile.toProfileJSON(false) })
 				}
-				return res.json({
-					profile: req.profile.toProfileJSON(user)
-				})
+				return res.json({ profile: req.profile.toProfileJSON(user) })
 			})
 	} else {
-		return res.json({
-			profile: req.profile.toProfileJSON()
-		})
+		return res.json({ profile: req.profile.toProfileJSON() })
 	}
 })
 

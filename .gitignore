@@ -4,6 +4,7 @@ logs
 .DS_Store
 
 .idea/
+.vscode/
 
 npm-debug.log*
 
@@ -94,6 +95,6 @@ typings/
 
 # dotenv environment variables file
 .env
-
+/*.env
 # next.js build output
 .next
